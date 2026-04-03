@@ -12,7 +12,12 @@ import imgImage7 from "figma:asset/a979e4de3f5caa5fc393f579dd7d8a26a07bbeb7.png"
 import imgImage8 from "figma:asset/c8a19f83070842cdb0114610dfc72dce10b3d2ec.png";
 import imgExistingGallery from "../assets/existing-gallery.png";
 import imgExistingListMd from "../assets/existing-list.png";
-import imgExistingListXs from "../assets/existing-list-xs.png";
+import imgExistingListMobile01 from "../assets/existing-list-mobile-01.png";
+import imgExistingListMobile02 from "../assets/existing-list-mobile-02.png";
+import imgExistingListMobile03 from "../assets/existing-list-mobile-03.png";
+import imgExistingListMobile04 from "../assets/existing-list-mobile-04.png";
+import imgExistingListMobile05 from "../assets/existing-list-mobile-05.png";
+import imgExistingListMobile06 from "../assets/existing-list-mobile-06.png";
 import imgListImage8 from "../assets/list-image8.png";
 import imgListImage9 from "../assets/list-image9.png";
 import imgListImage10 from "../assets/list-image10.png";
@@ -25,8 +30,44 @@ import imgMixedArticle1 from "../assets/mixed-article-1.png";
 import imgMixedArticle2 from "../assets/mixed-article-2.png";
 import imgMixedArticle3 from "../assets/mixed-article-3.png";
 import imgMixedWef from "../assets/mixed-wef.png";
-import imgMixedCareer from "../assets/mixed-career.png";
+import imgMixedCareerChatIcon from "../assets/mixed-career-chat-icon.png";
 import imgExistingMixed from "../assets/existing-mixed.png";
+import imgExistingMixedMobile01 from "../assets/existing-mixed-mobile-01.png";
+import imgExistingMixedMobile02 from "../assets/existing-mixed-mobile-02.png";
+import imgExistingMixedMobile03 from "../assets/existing-mixed-mobile-03.png";
+import imgExistingMixedMobile04 from "../assets/existing-mixed-mobile-04.png";
+import imgExistingMixedMobile05 from "../assets/existing-mixed-mobile-05.png";
+import imgExistingMixedMobile06 from "../assets/existing-mixed-mobile-06.png";
+import imgExistingMixedMobile07 from "../assets/existing-mixed-mobile-07.png";
+
+/** List “before” mobile — Figma Email-audit 188:2236 (Live mobile) */
+const EXISTING_LIST_MOBILE_SLICES: {
+  outerH: number;
+  src: string;
+  placement: "top" | "bottom";
+  bottomPx?: number;
+}[] = [
+  { outerH: 714, src: imgExistingListMobile01, placement: "top" },
+  { outerH: 619, src: imgExistingListMobile02, placement: "bottom", bottomPx: -100 },
+  { outerH: 620, src: imgExistingListMobile03, placement: "bottom", bottomPx: -100 },
+  { outerH: 556, src: imgExistingListMobile04, placement: "bottom", bottomPx: -103 },
+  { outerH: 490, src: imgExistingListMobile05, placement: "bottom", bottomPx: -224 },
+  { outerH: 415, src: imgExistingListMobile06, placement: "bottom", bottomPx: 0 },
+];
+
+/** Mixed “before” mobile — Figma Email-audit 256:2579 (Live mobile) */
+const EXISTING_MIXED_MOBILE_SLICES: { w: number; h: number; imgH: string; imgTop: string; src: string }[] = [
+  { w: 393, h: 758, imgH: "112.4%", imgTop: "0", src: imgExistingMixedMobile01 },
+  { w: 393, h: 523, imgH: "162.91%", imgTop: "-35.95%", src: imgExistingMixedMobile02 },
+  { w: 393, h: 615, imgH: "138.54%", imgTop: "-19.67%", src: imgExistingMixedMobile03 },
+  { w: 393, h: 538, imgH: "158.36%", imgTop: "-26.58%", src: imgExistingMixedMobile04 },
+  { w: 393, h: 597, imgH: "142.71%", imgTop: "-21.44%", src: imgExistingMixedMobile05 },
+  { w: 393, h: 466, imgH: "182.83%", imgTop: "-29.4%", src: imgExistingMixedMobile06 },
+  { w: 393, h: 634, imgH: "134.38%", imgTop: "-34.38%", src: imgExistingMixedMobile07 },
+];
+
+const MOBILE_PREVIEW_W = 393;
+const MOBILE_PREVIEW_H = 852;
 
 function Divider() {
   return (
@@ -40,14 +81,14 @@ function Divider() {
   );
 }
 
-function Header() {
+function Header({ logo = "default" }: { logo?: "default" | "list-mixed-mobile" } = {}) {
+  const logoBoxClass =
+    logo === "list-mixed-mobile"
+      ? "inline-block h-[16px] w-[111px] md:h-[20px] md:w-[139.204px] relative shrink-0 cursor-pointer"
+      : "inline-block h-[20px] relative shrink-0 w-[139.204px] cursor-pointer";
   return (
     <div className="content-stretch flex flex-col gap-[16px] md:gap-[24px] items-center relative shrink-0 w-full">
-      <a
-        href={COURSERA_HOME_URL}
-        className="inline-block h-[20px] relative shrink-0 w-[139.204px] cursor-pointer"
-        aria-label="Coursera"
-      >
+      <a href={COURSERA_HOME_URL} className={logoBoxClass} aria-label="Coursera">
         <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 139.204 20">
           <path d={svgPathsDesktop.pbd2aa00} fill="#0056D2" />
         </svg>
@@ -452,14 +493,20 @@ type Template = "gallery" | "list" | "existing" | "existing-list" | "mixed" | "e
 
 const TEMPLATE_ORDER: Template[] = ["gallery", "existing", "list", "existing-list", "mixed", "existing-mixed"];
 
-const TEMPLATE_TAB_LABELS: Record<Template, string> = {
-  gallery: "New Gallery view",
-  existing: "Existing gallery view",
-  list: "New list view",
-  "existing-list": "Existing list view",
-  mixed: "New mixed view",
-  "existing-mixed": "Existing mixed view",
+/** Compare “existing” (before) vs “new” (after) per email type. */
+type EmailKind = "gallery" | "list" | "mixed";
+
+const EMAIL_KIND_TO_TEMPLATES: Record<EmailKind, { before: Template; after: Template }> = {
+  gallery: { before: "existing", after: "gallery" },
+  list: { before: "existing-list", after: "list" },
+  mixed: { before: "existing-mixed", after: "mixed" },
 };
+
+const EMAIL_KIND_OPTIONS: { value: EmailKind; label: string }[] = [
+  { value: "gallery", label: "Gallery" },
+  { value: "list", label: "List" },
+  { value: "mixed", label: "Mixed" },
+];
 
 function parseTemplateParam(search: string): Template {
   const t = new URLSearchParams(search).get("template") as Template | null;
@@ -497,7 +544,7 @@ function ListCourseItem({ image, provider, title, meta }: { image: string; provi
       <div className="relative rounded-[8px] shrink-0 size-[100px] md:size-[128px]">
         <img alt={title} className="absolute inset-0 max-w-none object-cover pointer-events-none rounded-[8px] size-full" src={image} />
       </div>
-      <div className="content-stretch flex flex-[1_0_0] flex-col gap-[8px] items-start justify-center min-h-px min-w-px relative">
+      <div className="content-stretch flex flex-[1_0_0] flex-col gap-[4px] items-start justify-center min-h-px min-w-px relative">
         <p className="font-['Helvetica:Regular',sans-serif] leading-[18px] not-italic relative shrink-0 text-[12px] text-[#0f1114] w-full md:leading-[20px] md:text-[14px]">{provider}</p>
         <div className="flex flex-col gap-[4px] w-full">
           <p className="font-['Helvetica:Bold',sans-serif] font-bold leading-[20px] not-italic relative shrink-0 text-[#0f1114] text-[16px] w-full md:group-hover:underline">{title}</p>
@@ -531,8 +578,8 @@ function ListPromo() {
 
 function ListRecommendations() {
   return (
-    <div className="content-stretch flex flex-col gap-[24px] md:gap-[32px] items-start relative shrink-0 w-full">
-      <div className="content-stretch flex flex-col gap-[8px] md:gap-[12px] items-start relative shrink-0 w-full">
+    <div className="content-stretch flex flex-col pt-[16px] items-start relative shrink-0 w-full">
+      <div className="content-stretch flex flex-col gap-[16px] items-start relative shrink-0 w-full">
         <p className="font-['Helvetica:Bold',sans-serif] font-bold leading-[36px] md:leading-[40px] not-italic relative shrink-0 text-[#0f1114] text-[28px] md:text-[32px] w-full">
           Recommendations for you
         </p>
@@ -581,20 +628,20 @@ function ListDisclaimer() {
 function ListBody() {
   return (
     <div className="bg-white relative shrink-0 w-full">
-      <div className="flex flex-col justify-center size-full">
-        <div className="content-stretch flex flex-col items-start justify-center pb-[32px] md:pb-[48px] pt-[24px] md:pt-[32px] px-[32px] md:px-[48px] relative w-full font-['Helvetica:Regular',sans-serif] text-[#0f1114]">
-          <div className="content-stretch flex flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0 w-full">
-            <div className="content-stretch flex flex-col gap-[16px] md:gap-[24px] items-start relative shrink-0 w-full">
-              <Header />
-              <div className="content-stretch flex items-center justify-center relative rounded-[16px] shrink-0 w-full">
+      <div className="flex w-full flex-col">
+        <div className="content-stretch flex flex-col items-start pb-[32px] md:pb-[48px] pt-[24px] md:pt-[32px] px-[24px] md:px-[48px] relative w-full min-w-0 font-['Helvetica:Regular',sans-serif] text-[#0f1114]">
+          <div className="content-stretch flex w-full min-w-0 flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0">
+            <div className="content-stretch flex w-full min-w-0 flex-col gap-[16px] md:gap-[24px] items-start relative shrink-0">
+              <Header logo="list-mixed-mobile" />
+              <div className="content-stretch flex w-full min-w-0 items-center justify-center relative rounded-[16px] shrink-0">
                 <ListPromo />
               </div>
-            </div>
-            <div className="content-stretch flex flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0 w-full">
-              <ListRecommendations />
-              <Divider />
-              <ListCourseSection />
-              <Divider />
+              <div className="content-stretch flex w-full min-w-0 flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0">
+                <ListRecommendations />
+                <Divider />
+                <ListCourseSection />
+                <Divider />
+              </div>
             </div>
             <ListDisclaimer />
           </div>
@@ -621,14 +668,97 @@ function ExistingGalleryView() {
   );
 }
 
-/** PNG baseline — SM/MD 1440 preview (Gmail chrome). XS 393 slot for this template is intentionally blank (rebuild later). */
-function ExistingListViewStatic() {
+/** Gmail message actions — pinned to viewport bottom while the email scrolls (Figma Email-audit 258:2858). */
+function GmailMobileStickyBottomStrip() {
+  const actions: { icon: string; label: string }[] = [
+    { icon: "M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z", label: "Reply" },
+    { icon: "M7 8V5l-7 7 7 7v-3l-4-4 4-4zm6 1V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z", label: "Reply all" },
+    { icon: "M12 8V4l8 8-8 8v-4H4V8h8z", label: "Forward" },
+  ];
+  return (
+    <div className="relative z-20 w-full shrink-0 border-t border-[#e0e0e0] bg-white shadow-[0_-4px_16px_rgba(60,64,67,0.06)]">
+      <div className="flex flex-wrap items-center gap-2 px-3 py-3 pb-[max(12px,calc(env(safe-area-inset-bottom)+8px))]">
+        {actions.map(({ icon, label }) => (
+          <button
+            key={label}
+            type="button"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-[#dadce0] px-3 text-[13px] font-medium text-[#5f6368] hover:bg-[#f1f3f4] transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#5f6368" aria-hidden>
+              <path d={icon} />
+            </svg>
+            {label}
+          </button>
+        ))}
+        <button
+          type="button"
+          className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-[#e8eaed] transition-colors"
+          aria-label="Insert emoji"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#5f6368" aria-hidden>
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ExistingListMobileSlices() {
+  return (
+    <>
+      {EXISTING_LIST_MOBILE_SLICES.map((slice, i) => (
+        <div
+          key={i}
+          className="relative w-full max-w-[393px] shrink-0 overflow-hidden"
+          style={{ height: slice.outerH }}
+        >
+          <div
+            className="absolute left-0 w-[393px] max-w-full"
+            style={
+              slice.placement === "top"
+                ? { top: 0, height: MOBILE_PREVIEW_H, width: 393 }
+                : { bottom: slice.bottomPx ?? 0, height: MOBILE_PREVIEW_H, width: 393 }
+            }
+          >
+            <img
+              alt=""
+              className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+              src={slice.src}
+            />
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function ExistingListViewStatic({ stickyMobileBottomChrome }: { stickyMobileBottomChrome?: boolean } = {}) {
   return (
     <div className="content-stretch flex flex-col items-start relative w-[393px] md:w-[700px] max-w-full">
-      <picture className="block w-full">
-        <source media="(min-width: 768px)" srcSet={imgExistingListMd} />
-        <img alt="Existing list email design" className="block h-auto w-full" src={imgExistingListXs} />
-      </picture>
+      {stickyMobileBottomChrome ? (
+        <div
+          className="flex h-[852px] max-h-[852px] w-full max-w-[393px] flex-col overflow-hidden md:hidden"
+          role="img"
+          aria-label="List email — before (Figma mobile)"
+        >
+          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain [touch-action:pan-y] [-webkit-overflow-scrolling:touch]">
+            <div className="flex w-full flex-col bg-white">
+              <ExistingListMobileSlices />
+            </div>
+          </div>
+          <GmailMobileStickyBottomStrip />
+        </div>
+      ) : (
+        <div className="flex w-full flex-col md:hidden" role="img" aria-label="List email — before (Figma mobile)">
+          <ExistingListMobileSlices />
+        </div>
+      )}
+      <img
+        alt="List email — before"
+        className="hidden w-full md:block"
+        src={imgExistingListMd}
+      />
     </div>
   );
 }
@@ -636,7 +766,33 @@ function ExistingListViewStatic() {
 function ExistingMixedView() {
   return (
     <div className="content-stretch flex flex-col items-start relative w-[393px] md:w-[700px] max-w-full">
-      <img alt="Existing mixed email design: Turning AI into a productivity superpower" className="w-full" src={imgExistingMixed} />
+      <div
+        className="flex w-full flex-col md:hidden"
+        role="img"
+        aria-label="Existing mixed email design: Turning AI into a productivity superpower"
+      >
+        {EXISTING_MIXED_MOBILE_SLICES.map((slice, i) => (
+          <div
+            key={i}
+            className="relative w-full shrink-0"
+            style={{ aspectRatio: `${slice.w} / ${slice.h}` }}
+          >
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <img
+                alt=""
+                className="absolute left-0 max-w-none w-full"
+                style={{ height: slice.imgH, top: slice.imgTop }}
+                src={slice.src}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <img
+        alt="Existing mixed email design: Turning AI into a productivity superpower"
+        className="hidden w-full md:block"
+        src={imgExistingMixed}
+      />
     </div>
   );
 }
@@ -671,7 +827,7 @@ function MixedBody() {
     <div className="bg-white content-stretch flex flex-col items-start justify-center pb-[32px] md:pb-[48px] pt-[24px] md:pt-[32px] px-[24px] md:px-[48px] relative shrink-0 w-full font-['Helvetica:Regular',sans-serif] text-[#0f1114]">
       <div className="content-stretch flex flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0 w-full">
         <div className="content-stretch flex flex-col gap-[24px] items-start relative shrink-0 w-full">
-          <Header />
+          <Header logo="list-mixed-mobile" />
           {/* Hero — Title Large: XS 28/36, SM/MD 32/40 (Email audit 155:8878 / 155:8935); body Body Primary 16/24 */}
           <div className="content-stretch flex flex-col gap-[32px] md:gap-[48px] items-start relative shrink-0 w-full">
             {/* Hero content */}
@@ -792,24 +948,26 @@ function MixedBody() {
           </div>
         </div>
         <Divider />
-        {/* Career tips — Subtitle Large 20/24 headline; Body Primary 16/24; link Action Primary 14/22 Bold */}
-        <div className="bg-[#f0f6ff] content-stretch flex flex-col gap-[16px] items-start px-[32px] pb-[32px] pt-[24px] md:px-[32px] md:pb-[32px] md:pt-[32px] relative rounded-[16px] shrink-0 w-full">
-          <div className="content-stretch flex w-full flex-col gap-[16px] md:flex-row md:items-center md:gap-[48px]">
-            <div className="content-stretch flex w-full min-w-0 flex-col gap-[16px] items-start leading-[24px] not-italic md:flex-[1_0_0]">
-              <p className="w-full shrink-0 font-['Helvetica:Bold',sans-serif] font-bold text-[20px] leading-[24px]">
-                Looking for more career tips?
-              </p>
-              <p className="w-full shrink-0 text-[14px] leading-[20px] font-normal">
-                Coursera&apos;s Career Chat will answer your career questions and share resources to support your career growth.
-              </p>
-            </div>
-            <div className="relative hidden size-[80px] shrink-0 md:block">
-              <img alt="" className="pointer-events-none absolute inset-0 size-full max-w-none object-cover" src={imgMixedCareer} />
-            </div>
+        {/* Career tips — Figma Email-audit 230:3352: 48px icon, pt/px 24 pb 16, ghost CTA */}
+        <div className="content-stretch flex w-full shrink-0 flex-col gap-[16px] items-start rounded-[16px] bg-[#f0f6ff] px-[24px] pb-[16px] pt-[24px] md:px-[32px] md:pb-[32px] md:pt-[32px]">
+          <div className="relative size-[48px] shrink-0">
+            <img
+              alt=""
+              className="pointer-events-none absolute inset-0 size-full max-w-none object-cover"
+              src={imgMixedCareerChatIcon}
+            />
+          </div>
+          <div className="content-stretch flex w-full min-w-0 flex-col gap-[12px] items-start not-italic text-[#0f1114]">
+            <p className="w-full shrink-0 font-['Helvetica:Bold',sans-serif] font-bold text-[20px] leading-[24px]">
+              Looking for more career tips?
+            </p>
+            <p className="w-full shrink-0 font-['Helvetica:Regular',sans-serif] text-[14px] font-normal leading-[20px]">
+              Coursera&apos;s Career Chat will answer your career questions and share resources to support your career growth.
+            </p>
           </div>
           <a
             href={MIXED_CAREER_CHAT_NEWSLETTER_URL}
-            className="inline-flex cursor-pointer items-center gap-[8px] font-['Helvetica:Bold',sans-serif] font-bold text-[14px] leading-[22px] tracking-[0.005em] text-[#0056d2] no-underline"
+            className="inline-flex cursor-pointer items-center gap-[8px] font-['Helvetica:Bold',sans-serif] font-bold text-[14px] leading-[22px] tracking-[0.005em] text-[#0056d2] no-underline hover:opacity-80"
           >
             Subscribe to Career Chat
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0" aria-hidden>
@@ -836,72 +994,98 @@ function MixedView() {
 
 type PreviewViewport = "xs" | "md";
 
+function ViewportTagCheck() {
+  return (
+    <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="shrink-0" aria-hidden>
+      <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** CDS-style control: template select, viewport tags, Before | After tabs (Figma Email-audit 254:2561). */
 function DesignPreviewNav({
-  template,
-  onTemplateChange,
+  emailKind,
+  onEmailKindChange,
   viewport,
   onViewportChange,
 }: {
-  template: Template;
-  onTemplateChange: (t: Template) => void;
+  emailKind: EmailKind;
+  onEmailKindChange: (k: EmailKind) => void;
   viewport: PreviewViewport;
   onViewportChange: (v: PreviewViewport) => void;
 }) {
   return (
-    <div className="w-full rounded-[12px] border border-[#e8eaed] bg-white shadow-sm overflow-hidden">
-      <div className="flex flex-wrap gap-x-8 gap-y-1 px-5 pt-5 pb-0">
-        {TEMPLATE_ORDER.map((key) => {
-          const active = template === key;
-          return (
+    <div
+      className="w-full rounded-[12px] border border-[#dae1ed] bg-white px-5 py-5 shadow-sm font-['Source_Sans_3',system-ui,sans-serif]"
+      data-name="control"
+    >
+      <div className="flex flex-col gap-8">
+        <div className="flex h-full w-full flex-col gap-6 lg:flex-row lg:items-start lg:justify-start">
+          <div className="flex min-w-0 max-w-xl flex-1 flex-col gap-2">
+            <label htmlFor="email-kind-select" className="text-[14px] font-semibold leading-[18px] tracking-[-0.3px] text-[#0f1114]">
+              Template
+            </label>
+            <select
+              id="email-kind-select"
+              value={emailKind}
+              onChange={(e) => onEmailKindChange(e.target.value as EmailKind)}
+              className="h-11 w-full max-w-md rounded-lg border border-[#dae1ed] bg-white px-3 text-[16px] leading-6 text-[#0f1114] shadow-sm outline-none ring-[#0056d2] focus:ring-2"
+            >
+              {EMAIL_KIND_OPTIONS.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-6" data-name="screen size">
+            <span className="sr-only">Preview width</span>
             <button
-              key={key}
               type="button"
-              onClick={() => onTemplateChange(key)}
-              className={`relative pb-3 text-[14px] leading-tight transition-colors ${
-                active ? "font-bold text-[#0f1114]" : "font-normal text-[#8b95a5] hover:text-[#0f1114]"
+              onClick={() => onViewportChange("md")}
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
+                viewport === "md"
+                  ? "bg-[#0f1114] text-white shadow-sm"
+                  : "border border-[#dae1ed] bg-white text-[#5b6780] hover:bg-[#f6f8fc]"
               }`}
             >
-              {TEMPLATE_TAB_LABELS[key]}
-              {active && <span className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-[1px] bg-[#0f1114]" aria-hidden />}
+              {viewport === "md" && (
+                <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20 text-white" aria-hidden>
+                  <ViewportTagCheck />
+                </span>
+              )}
+              SM/MD 1440px
             </button>
-          );
-        })}
-      </div>
-      <div className="h-px w-full bg-[#e8eaed]" />
-      <div className="flex flex-wrap items-center gap-3 px-5 py-4">
-        <span className="sr-only">Preview width</span>
-        <button
-          type="button"
-          onClick={() => onViewportChange("md")}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors ${
-            viewport === "md" ? "bg-[#4a5568] text-white shadow-sm" : "bg-[#eef2f7] text-[#4a5568] hover:bg-[#e4eaf2]"
-          }`}
-        >
-          {viewport === "md" && (
-            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden>
-              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="text-white">
-                <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-          )}
-          SM/MD 1440px
-        </button>
-        <button
-          type="button"
-          onClick={() => onViewportChange("xs")}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors ${
-            viewport === "xs" ? "bg-[#4a5568] text-white shadow-sm" : "bg-[#eef2f7] text-[#4a5568] hover:bg-[#e4eaf2]"
-          }`}
-        >
-          {viewport === "xs" && (
-            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden>
-              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="text-white">
-                <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-          )}
-          XS 393px
-        </button>
+            <button
+              type="button"
+              onClick={() => onViewportChange("xs")}
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-semibold transition-colors ${
+                viewport === "xs"
+                  ? "bg-[#0f1114] text-white shadow-sm"
+                  : "border border-[#dae1ed] bg-white text-[#5b6780] hover:bg-[#f6f8fc]"
+              }`}
+            >
+              {viewport === "xs" && (
+                <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20 text-white" aria-hidden>
+                  <ViewportTagCheck />
+                </span>
+              )}
+              XS {MOBILE_PREVIEW_W}×{MOBILE_PREVIEW_H}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex w-full flex-col gap-3" data-name="comparison-labels">
+          <div className="flex w-full gap-4">
+            <div className="min-w-0 flex-1 text-center font-['Source_Sans_3',system-ui,sans-serif] text-[24px] font-semibold leading-5 text-[#0f1114]">
+              Before
+            </div>
+            <div className="min-w-0 flex-1 text-center font-['Source_Sans_3',system-ui,sans-serif] text-[24px] font-semibold leading-5 text-[#0f1114]">
+              After
+            </div>
+          </div>
+          <div className="h-px w-full shrink-0 border-t border-[#dae1ed]" data-name="Divider" />
+        </div>
       </div>
     </div>
   );
@@ -913,11 +1097,21 @@ function AppEmbedShell() {
     gallery: <GalleryView />,
     list: <ListView />,
     existing: <ExistingGalleryView />,
-    "existing-list": null,
+    "existing-list": <ExistingListViewStatic stickyMobileBottomChrome />,
     mixed: <MixedView />,
     "existing-mixed": <ExistingMixedView />,
   };
-  return <div className="min-h-screen w-full bg-[#f5f5f5]">{views[template]}</div>;
+  return (
+    <div
+      className={
+        template === "existing-list"
+          ? "h-[852px] max-h-[852px] w-full overflow-hidden bg-[#f5f5f5]"
+          : "min-h-0 w-full bg-[#f5f5f5]"
+      }
+    >
+      {views[template]}
+    </div>
+  );
 }
 
 function GmailSidebar() {
@@ -933,52 +1127,6 @@ function GmailSidebar() {
         <button className="w-[48px] h-[48px] rounded-full flex items-center justify-center hover:bg-[#e8eaed] transition-colors">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="#444746"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
         </button>
-      </div>
-    </div>
-  );
-}
-
-function GmailNavPanel() {
-  return (
-    <div className="w-[176px] flex flex-col pt-[8px] shrink-0 overflow-hidden">
-      <button className="mx-[16px] mb-[16px] h-[56px] w-[136px] bg-[#c2e7ff] rounded-[16px] flex items-center gap-[12px] px-[20px] text-[14px] font-medium text-[#001d35] hover:shadow-md transition-shadow">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 000-1.42l-2.34-2.34a1.003 1.003 0 00-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" fill="#001d35"/></svg>
-        Compose
-      </button>
-      <div className="flex flex-col">
-        <div className="flex items-center px-[24px] h-[32px] bg-[#d3e3fd] rounded-r-full text-[14px] font-bold text-[#001d35]">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#001d35" className="mr-[16px] shrink-0"><path d="M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"/></svg>
-          <span className="flex-1">Inbox</span>
-          <span className="text-[12px] font-bold">4,953</span>
-        </div>
-        {[
-          { icon: "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z", label: "Starred" },
-          { icon: "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z", label: "Snoozed" },
-          { icon: "M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z", label: "Sent" },
-        ].map(({ icon, label }) => (
-          <div key={label} className="flex items-center px-[24px] h-[32px] rounded-r-full text-[14px] text-[#444746] hover:bg-[#e8eaed] transition-colors cursor-pointer">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#444746" className="mr-[16px] shrink-0"><path d={icon} /></svg>
-            <span>{label}</span>
-          </div>
-        ))}
-        <div className="flex items-center px-[24px] h-[32px] rounded-r-full text-[14px] text-[#444746] hover:bg-[#e8eaed] transition-colors cursor-pointer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#444746" className="mr-[16px] shrink-0"><path d="M21.99 8c0-.72-.37-1.35-.94-1.7L12 1 2.95 6.3C2.38 6.65 2 7.28 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2l-.01-10z" /></svg>
-          <span className="flex-1">Drafts</span>
-          <span className="text-[12px]">7</span>
-        </div>
-        <div className="flex items-center px-[24px] h-[32px] rounded-r-full text-[14px] text-[#444746] hover:bg-[#e8eaed] transition-colors cursor-pointer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#444746" className="mr-[16px] shrink-0"><path d="M18 6V4l-2-2h-5L9 4v2H3v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6h-3zm-7-2h2l1 1v1h-4V5l1-1zm7 16H6V8h12v12z" /></svg>
-          <span className="flex-1">Purchases</span>
-          <span className="text-[12px]">398</span>
-        </div>
-        <div className="flex items-center px-[24px] h-[32px] rounded-r-full text-[14px] text-[#444746] hover:bg-[#e8eaed] transition-colors cursor-pointer">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#444746" className="mr-[16px] shrink-0"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" /></svg>
-          <span>More</span>
-        </div>
-        <div className="mt-[16px] flex items-center justify-between px-[24px] h-[32px]">
-          <span className="text-[14px] font-medium text-[#444746]">Labels</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#444746" className="cursor-pointer"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-        </div>
       </div>
     </div>
   );
@@ -1126,7 +1274,6 @@ function GmailWrapper({ children, subject }: { children: React.ReactNode; subjec
       <GmailTopBar />
       <div className="flex flex-1 overflow-hidden">
         <GmailSidebar />
-        <GmailNavPanel />
         <div className="flex-1 flex flex-col bg-white rounded-tl-[16px] overflow-hidden">
           <GmailEmailHeader subject={subject} />
           <div className="flex-1 overflow-auto flex justify-center bg-white">
@@ -1142,7 +1289,7 @@ function GmailWrapper({ children, subject }: { children: React.ReactNode; subjec
 }
 
 export default function App() {
-  const [template, setTemplate] = useState<Template>("gallery");
+  const [emailKind, setEmailKind] = useState<EmailKind>("gallery");
   const [previewViewport, setPreviewViewport] = useState<PreviewViewport>("md");
 
   const isEmbed =
@@ -1152,6 +1299,8 @@ export default function App() {
     return <AppEmbedShell />;
   }
 
+  const { before: beforeTemplate, after: afterTemplate } = EMAIL_KIND_TO_TEMPLATES[emailKind];
+
   const views: Record<Template, import("react").ReactNode> = {
     gallery: <GalleryView />,
     list: <ListView />,
@@ -1160,7 +1309,8 @@ export default function App() {
     mixed: <MixedView />,
     "existing-mixed": <ExistingMixedView />,
   };
-  const emailContent = views[template];
+  const beforeContent = views[beforeTemplate];
+  const afterContent = views[afterTemplate];
 
   const subjectLines: Record<Template, string> = {
     gallery: "New from Google! Go from familiar to AI fluent in 10 hours",
@@ -1171,54 +1321,64 @@ export default function App() {
     "existing-mixed": "High-income skills: Turning AI into a productivity superpower",
   };
 
-  const iframeSrc =
+  const embedSrc = (t: Template) =>
     typeof window !== "undefined"
       ? (() => {
           const u = new URL(window.location.href);
           u.searchParams.set("embed", "1");
-          u.searchParams.set("template", template);
+          u.searchParams.set("template", t);
           return u.toString();
         })()
       : "";
 
+  const beforeIframeSrc = embedSrc(beforeTemplate);
+  const afterIframeSrc = embedSrc(afterTemplate);
+
   return (
-    <div className="min-h-screen flex flex-col items-center bg-[#f5f5f5]">
-      <div className="w-full max-w-[1600px] px-4 pt-4 pb-2">
+    <div className="flex min-h-screen w-full flex-col bg-[#f5f5f5]">
+      <div className="w-full max-w-[1800px] shrink-0 px-0 pt-4 pb-2">
         <DesignPreviewNav
-          template={template}
-          onTemplateChange={setTemplate}
+          emailKind={emailKind}
+          onEmailKindChange={setEmailKind}
           viewport={previewViewport}
           onViewportChange={setPreviewViewport}
         />
       </div>
 
       {previewViewport === "xs" ? (
-        <div className="flex w-full flex-1 justify-center px-4 pb-8">
-          {template === "existing-list" ? (
-            <div
-              className="w-[393px] max-w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
-              style={{ height: "calc(100vh - 200px)", minHeight: 560 }}
-              aria-hidden
-            />
-          ) : (
-            <iframe
-              key={template}
-              title="Email preview — 393px width"
-              className="w-[393px] max-w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
-              style={{ height: "calc(100vh - 200px)", minHeight: 560 }}
-              src={iframeSrc}
-            />
-          )}
-        </div>
-      ) : (
-        <>
-          {/* SM/MD preview: always show Gmail chrome + email (ignores browser width) */}
-          <div className="flex w-full justify-center px-4 pb-4">
-            <div className="w-full max-w-[1400px]">
-              <GmailWrapper subject={subjectLines[template]}>{emailContent}</GmailWrapper>
+        <div className="flex min-h-0 w-full flex-1 justify-center overflow-x-auto px-4 pb-8">
+          <div className="flex min-w-min flex-row items-start gap-3 sm:gap-4">
+            <div className="w-[393px] shrink-0">
+              <iframe
+                key={beforeTemplate}
+                title={`Email preview — Before — ${MOBILE_PREVIEW_W}×${MOBILE_PREVIEW_H}`}
+                className="w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
+                style={{ height: MOBILE_PREVIEW_H, minHeight: MOBILE_PREVIEW_H }}
+                src={beforeIframeSrc}
+              />
+            </div>
+            <div className="w-[393px] shrink-0">
+              <iframe
+                key={afterTemplate}
+                title={`Email preview — After — ${MOBILE_PREVIEW_W}×${MOBILE_PREVIEW_H}`}
+                className="w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
+                style={{ height: MOBILE_PREVIEW_H, minHeight: MOBILE_PREVIEW_H }}
+                src={afterIframeSrc}
+              />
             </div>
           </div>
-        </>
+        </div>
+      ) : (
+        <div className="flex min-h-0 w-full flex-1 justify-center px-4 pb-4">
+          <div className="grid w-full max-w-[1800px] grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="min-w-0">
+              <GmailWrapper subject={subjectLines[beforeTemplate]}>{beforeContent}</GmailWrapper>
+            </div>
+            <div className="min-w-0">
+              <GmailWrapper subject={subjectLines[afterTemplate]}>{afterContent}</GmailWrapper>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

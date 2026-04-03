@@ -1,3 +1,29 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/*
+ * ?embed=1 loads inside a fixed 393×852 iframe (Figma mobile artboard).
+ * Fill the iframe, then scroll when email content is taller than the viewport.
+ */
+html.email-embed-preview {
+  min-height: 100%;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.email-embed-preview body {
+  min-height: 100%;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html.email-embed-preview #root {
+  display: block;
+  min-height: min-content;
+  height: auto;
+  overflow: visible;
+}
