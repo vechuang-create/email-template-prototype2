@@ -11,7 +11,8 @@ import imgImage6 from "figma:asset/ac986be69020249ee50e2508f158321c917ede1a.png"
 import imgImage7 from "figma:asset/a979e4de3f5caa5fc393f579dd7d8a26a07bbeb7.png";
 import imgImage8 from "figma:asset/c8a19f83070842cdb0114610dfc72dce10b3d2ec.png";
 import imgExistingGallery from "../assets/existing-gallery.png";
-import imgExistingList from "../assets/existing-list.png";
+import imgExistingListMd from "../assets/existing-list.png";
+import imgExistingListXs from "../assets/existing-list-xs.png";
 import imgListImage8 from "../assets/list-image8.png";
 import imgListImage9 from "../assets/list-image9.png";
 import imgListImage10 from "../assets/list-image10.png";
@@ -449,6 +450,23 @@ function Footer() {
 
 type Template = "gallery" | "list" | "existing" | "existing-list" | "mixed" | "existing-mixed";
 
+const TEMPLATE_ORDER: Template[] = ["gallery", "existing", "list", "existing-list", "mixed", "existing-mixed"];
+
+const TEMPLATE_TAB_LABELS: Record<Template, string> = {
+  gallery: "New Gallery view",
+  existing: "Existing gallery view",
+  list: "New list view",
+  "existing-list": "Existing list view",
+  mixed: "New mixed view",
+  "existing-mixed": "Existing mixed view",
+};
+
+function parseTemplateParam(search: string): Template {
+  const t = new URLSearchParams(search).get("template") as Template | null;
+  if (t && TEMPLATE_ORDER.includes(t)) return t;
+  return "gallery";
+}
+
 function GalleryView() {
   return (
     <div className="content-stretch flex flex-col items-start relative w-[393px] md:w-[700px] max-w-full">
@@ -603,10 +621,14 @@ function ExistingGalleryView() {
   );
 }
 
-function ExistingListView() {
+/** PNG baseline — SM/MD 1440 preview (Gmail chrome). XS 393 slot for this template is intentionally blank (rebuild later). */
+function ExistingListViewStatic() {
   return (
     <div className="content-stretch flex flex-col items-start relative w-[393px] md:w-[700px] max-w-full">
-      <img alt="Existing list email design" className="w-full" src={imgExistingList} />
+      <picture className="block w-full">
+        <source media="(min-width: 768px)" srcSet={imgExistingListMd} />
+        <img alt="Existing list email design" className="block h-auto w-full" src={imgExistingListXs} />
+      </picture>
     </div>
   );
 }
@@ -812,57 +834,90 @@ function MixedView() {
   );
 }
 
-function TemplateSwitcher({ value, onChange }: { value: Template; onChange: (t: Template) => void }) {
-  const [open, setOpen] = useState(false);
+type PreviewViewport = "xs" | "md";
 
-  const labels: Record<Template, string> = {
-    gallery: "New gallery view",
-    existing: "Existing gallery view",
-    list: "New list view",
-    "existing-list": "Existing list view",
-    mixed: "New mixed view",
-    "existing-mixed": "Existing mixed view",
-  };
-
+function DesignPreviewNav({
+  template,
+  onTemplateChange,
+  viewport,
+  onViewportChange,
+}: {
+  template: Template;
+  onTemplateChange: (t: Template) => void;
+  viewport: PreviewViewport;
+  onViewportChange: (v: PreviewViewport) => void;
+}) {
   return (
-    <div className="relative inline-block text-left">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-[8px] rounded-[10px] border border-[#dae1ed] bg-white px-[16px] py-[10px] text-[14px] font-semibold text-[#0f1114] shadow-sm hover:bg-[#f9fafb] transition-colors"
-      >
-        {labels[value]}
-        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className={`transition-transform ${open ? "rotate-180" : ""}`}>
-          <path d="M1 1.5L6 6.5L11 1.5" stroke="#5b6780" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 z-20 mt-[4px] w-[220px] origin-top-left rounded-[10px] border border-[#dae1ed] bg-white shadow-lg">
-            {(Object.keys(labels) as Template[]).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => { onChange(key); setOpen(false); }}
-                className={`flex w-full items-center gap-[8px] px-[16px] py-[10px] text-[14px] first:rounded-t-[10px] last:rounded-b-[10px] transition-colors ${
-                  value === key ? "bg-[#f0f6ff] text-[#0056d2] font-semibold" : "text-[#0f1114] hover:bg-[#f9fafb]"
-                }`}
-              >
-                {value === key && (
-                  <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
-                    <path d="M1 5L5 9L13 1" stroke="#0056d2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-                {labels[key]}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+    <div className="w-full rounded-[12px] border border-[#e8eaed] bg-white shadow-sm overflow-hidden">
+      <div className="flex flex-wrap gap-x-8 gap-y-1 px-5 pt-5 pb-0">
+        {TEMPLATE_ORDER.map((key) => {
+          const active = template === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onTemplateChange(key)}
+              className={`relative pb-3 text-[14px] leading-tight transition-colors ${
+                active ? "font-bold text-[#0f1114]" : "font-normal text-[#8b95a5] hover:text-[#0f1114]"
+              }`}
+            >
+              {TEMPLATE_TAB_LABELS[key]}
+              {active && <span className="absolute bottom-0 left-0 right-0 h-[3px] rounded-t-[1px] bg-[#0f1114]" aria-hidden />}
+            </button>
+          );
+        })}
+      </div>
+      <div className="h-px w-full bg-[#e8eaed]" />
+      <div className="flex flex-wrap items-center gap-3 px-5 py-4">
+        <span className="sr-only">Preview width</span>
+        <button
+          type="button"
+          onClick={() => onViewportChange("md")}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors ${
+            viewport === "md" ? "bg-[#4a5568] text-white shadow-sm" : "bg-[#eef2f7] text-[#4a5568] hover:bg-[#e4eaf2]"
+          }`}
+        >
+          {viewport === "md" && (
+            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden>
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="text-white">
+                <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          )}
+          SM/MD 1440px
+        </button>
+        <button
+          type="button"
+          onClick={() => onViewportChange("xs")}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-[13px] font-medium transition-colors ${
+            viewport === "xs" ? "bg-[#4a5568] text-white shadow-sm" : "bg-[#eef2f7] text-[#4a5568] hover:bg-[#e4eaf2]"
+          }`}
+        >
+          {viewport === "xs" && (
+            <span className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-white/20" aria-hidden>
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" className="text-white">
+                <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          )}
+          XS 393px
+        </button>
+      </div>
     </div>
   );
+}
+
+function AppEmbedShell() {
+  const template = parseTemplateParam(typeof window !== "undefined" ? window.location.search : "");
+  const views: Record<Template, import("react").ReactNode> = {
+    gallery: <GalleryView />,
+    list: <ListView />,
+    existing: <ExistingGalleryView />,
+    "existing-list": null,
+    mixed: <MixedView />,
+    "existing-mixed": <ExistingMixedView />,
+  };
+  return <div className="min-h-screen w-full bg-[#f5f5f5]">{views[template]}</div>;
 }
 
 function GmailSidebar() {
@@ -1067,7 +1122,7 @@ function GmailReplyBar() {
 
 function GmailWrapper({ children, subject }: { children: React.ReactNode; subject: string }) {
   return (
-    <div className="hidden md:flex flex-col w-full bg-[#f6f8fc] rounded-[12px] overflow-hidden border border-[#e0e0e0] shadow-sm" style={{ minHeight: "90vh" }}>
+    <div className="flex flex-col w-full bg-[#f6f8fc] rounded-[12px] overflow-hidden border border-[#e0e0e0] shadow-sm" style={{ minHeight: "90vh" }}>
       <GmailTopBar />
       <div className="flex flex-1 overflow-hidden">
         <GmailSidebar />
@@ -1088,12 +1143,20 @@ function GmailWrapper({ children, subject }: { children: React.ReactNode; subjec
 
 export default function App() {
   const [template, setTemplate] = useState<Template>("gallery");
+  const [previewViewport, setPreviewViewport] = useState<PreviewViewport>("md");
 
-  const views: Record<Template, React.ReactNode> = {
+  const isEmbed =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("embed") === "1";
+
+  if (isEmbed) {
+    return <AppEmbedShell />;
+  }
+
+  const views: Record<Template, import("react").ReactNode> = {
     gallery: <GalleryView />,
     list: <ListView />,
     existing: <ExistingGalleryView />,
-    "existing-list": <ExistingListView />,
+    "existing-list": <ExistingListViewStatic />,
     mixed: <MixedView />,
     "existing-mixed": <ExistingMixedView />,
   };
@@ -1108,23 +1171,55 @@ export default function App() {
     "existing-mixed": "High-income skills: Turning AI into a productivity superpower",
   };
 
+  const iframeSrc =
+    typeof window !== "undefined"
+      ? (() => {
+          const u = new URL(window.location.href);
+          u.searchParams.set("embed", "1");
+          u.searchParams.set("template", template);
+          return u.toString();
+        })()
+      : "";
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#f5f5f5]">
-      <div className="w-full max-w-[1400px] px-[16px] py-[16px]">
-        <TemplateSwitcher value={template} onChange={setTemplate} />
+      <div className="w-full max-w-[1600px] px-4 pt-4 pb-2">
+        <DesignPreviewNav
+          template={template}
+          onTemplateChange={setTemplate}
+          viewport={previewViewport}
+          onViewportChange={setPreviewViewport}
+        />
       </div>
-      {/* Mobile: show email directly */}
-      <div className="flex justify-center w-full md:hidden">
-        {emailContent}
-      </div>
-      {/* Desktop: wrap in Gmail UI */}
-      <div className="hidden md:flex justify-center w-full px-[16px] pb-[16px]">
-        <div className="w-full max-w-[1400px]">
-          <GmailWrapper subject={subjectLines[template]}>
-            {emailContent}
-          </GmailWrapper>
+
+      {previewViewport === "xs" ? (
+        <div className="flex w-full flex-1 justify-center px-4 pb-8">
+          {template === "existing-list" ? (
+            <div
+              className="w-[393px] max-w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
+              style={{ height: "calc(100vh - 200px)", minHeight: 560 }}
+              aria-hidden
+            />
+          ) : (
+            <iframe
+              key={template}
+              title="Email preview — 393px width"
+              className="w-[393px] max-w-full rounded-[12px] border border-[#dae1ed] bg-white shadow-sm"
+              style={{ height: "calc(100vh - 200px)", minHeight: 560 }}
+              src={iframeSrc}
+            />
+          )}
         </div>
-      </div>
+      ) : (
+        <>
+          {/* SM/MD preview: always show Gmail chrome + email (ignores browser width) */}
+          <div className="flex w-full justify-center px-4 pb-4">
+            <div className="w-full max-w-[1400px]">
+              <GmailWrapper subject={subjectLines[template]}>{emailContent}</GmailWrapper>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
